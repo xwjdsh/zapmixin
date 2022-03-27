@@ -1,4 +1,4 @@
-package zapmixin_test
+package zapmixin
 
 import (
 	"context"
@@ -14,7 +14,6 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
-	"github.com/xwjdsh/zapmixin"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -43,7 +42,7 @@ func TestLevels(t *testing.T) {
 	client.On("SendMessage", mock.Anything, mock.Anything).Return(nil)
 
 	{
-		h, _ := zapmixin.New(client, conversations, zapmixin.WithSync())
+		h, _ := newHandler(client, conversations, WithSync())
 		logger := getLogger().WithOptions(zap.Hooks(h.Hook()))
 
 		// default level: warn
@@ -56,7 +55,7 @@ func TestLevels(t *testing.T) {
 
 	{
 		client.msgs = []*mixin.MessageRequest{}
-		h, _ := zapmixin.New(client, conversations, zapmixin.WithSync(), zapmixin.WithThresholdLevel(zapcore.ErrorLevel))
+		h, _ := newHandler(client, conversations, WithSync(), WithThresholdLevel(zapcore.ErrorLevel))
 		logger := getLogger().WithOptions(zap.Hooks(h.Hook()))
 
 		logger.Info("1")
@@ -89,7 +88,7 @@ func TestSuite(t *testing.T) {
 }
 
 func (s *Suite) TestBasic() {
-	h, err := zapmixin.New(s.client, s.conversations, zapmixin.WithSync())
+	h, err := New(s.client, s.conversations, WithSync())
 	s.NoError(err)
 
 	logger := getLogger().WithOptions(zap.Hooks(h.Hook()))

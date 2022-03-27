@@ -15,7 +15,11 @@ type Handler struct {
 	afterFunc     func(zapcore.Entry, *mixin.MessageRequest, error) error
 }
 
-func New(client MixinClient, conversations []string, opts ...Option) (*Handler, error) {
+func New(client *mixin.Client, conversations []string, opts ...Option) (*Handler, error) {
+	return newHandler(client, conversations, opts...)
+}
+
+func newHandler(client MixinClient, conversations []string, opts ...Option) (*Handler, error) {
 	h := &Handler{
 		client:        client,
 		conversations: conversations,
