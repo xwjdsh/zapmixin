@@ -21,9 +21,9 @@ func WithFixedLevel(l zapcore.Level) Option {
 	}
 }
 
-func WithAsync() Option {
+func WithSync() Option {
 	return func(h *Handler) error {
-		h.async = true
+		h.async = false
 		return nil
 	}
 }

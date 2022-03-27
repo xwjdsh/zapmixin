@@ -20,6 +20,7 @@ func New(client MixinClient, conversations []string, opts ...Option) (*Handler, 
 		client:        client,
 		conversations: conversations,
 		levels:        getLevelThreshold(zapcore.WarnLevel),
+		async:         true,
 	}
 
 	if err := h.Apply(opts...); err != nil {

@@ -39,12 +39,11 @@ func (m *MockedMixinClient) SendMessage(ctx context.Context, message *mixin.Mess
 }
 
 func TestLevels(t *testing.T) {
-
 	client := new(MockedMixinClient)
 	client.On("SendMessage", mock.Anything, mock.Anything).Return(nil)
 
 	{
-		h, _ := zapmixin.New(client, conversations)
+		h, _ := zapmixin.New(client, conversations, zapmixin.WithSync())
 		logger := getLogger().WithOptions(zap.Hooks(h.Hook()))
 
 		// default level: warn
@@ -57,10 +56,9 @@ func TestLevels(t *testing.T) {
 
 	{
 		client.msgs = []*mixin.MessageRequest{}
-		h, _ := zapmixin.New(client, []string{"06602963-d86d-3df3-ac06-000000000000"}, zapmixin.WithThresholdLevel(zapcore.ErrorLevel))
+		h, _ := zapmixin.New(client, conversations, zapmixin.WithSync(), zapmixin.WithThresholdLevel(zapcore.ErrorLevel))
 		logger := getLogger().WithOptions(zap.Hooks(h.Hook()))
 
-		// default level: warn
 		logger.Info("1")
 		logger.Warn("2")
 		logger.Error("3")
@@ -91,15 +89,12 @@ func TestSuite(t *testing.T) {
 }
 
 func (s *Suite) TestBasic() {
-	logger, err := zap.NewProduction()
+	h, err := zapmixin.New(s.client, s.conversations, zapmixin.WithSync())
 	s.NoError(err)
 
-	h, err := zapmixin.New(s.client, s.conversations)
-	s.NoError(err)
+	logger := getLogger().WithOptions(zap.Hooks(h.Hook()))
 
-	logger = logger.WithOptions(zap.Hooks(h.Hook()))
-
-	logger.Warn("test event") // by default hook handled level Warn and higher
+	logger.Warn("test event")
 }
 
 func getLogger() *zap.Logger {

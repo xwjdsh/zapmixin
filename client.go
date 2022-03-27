@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"time"
 
 	"github.com/fox-one/mixin-sdk-go"
 	"github.com/gofrs/uuid"
@@ -48,5 +49,6 @@ func (h *Handler) formatMessage(e zapcore.Entry) string {
 		loggerName = e.LoggerName
 	}
 
-	return fmt.Sprintf("Logger: %s\n%s\n%s\n%s", loggerName, e.Time, e.Level, e.Message)
+	return fmt.Sprintf("name: %s\ntime: %s\nlevel: %s\n\n %s",
+		loggerName, e.Time.Format(time.RFC3339), e.Level, e.Message)
 }
